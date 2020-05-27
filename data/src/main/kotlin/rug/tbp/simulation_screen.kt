@@ -38,9 +38,8 @@ fun main() {
         )
     )
     val numTrailPts: Int = 1000
-    val dt: Double = 2E-2
-    val targetFps: Int = 60
-    var context = Simulation(dt, initBodies, nPos = numTrailPts)
+    val dt = 2E-2
+    val context = Simulation(dt, initBodies, nPos = numTrailPts)
 
 
     SwingUtilities.invokeLater {

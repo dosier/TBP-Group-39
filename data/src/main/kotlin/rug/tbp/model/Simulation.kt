@@ -8,6 +8,8 @@ import java.awt.Color
 import java.awt.Dimension
 import java.awt.Graphics
 import java.awt.Graphics2D
+import java.io.PrintWriter
+import java.nio.file.Paths
 import javax.swing.JPanel
 
 /**
@@ -30,22 +32,40 @@ import javax.swing.JPanel
  */
 class Simulation(
     private val dt: Double,
-    private val initBodies: Set<Body> = emptySet(),
+    private var bodies: Set<Body> = emptySet(),
     private val areaWidth: Int = 100,
     private val areaHeight: Int = 100,
     private val nPos: Int = 0,
     private val nOld: Int = 0
 ) : JPanel(), Runnable {
 
+
+    private var totalTime = 0.0
+    private val file = Paths.get("simulation.csv").toFile()
+    private val writer : PrintWriter
+
     init {
         preferredSize = Dimension(areaWidth, areaHeight)
         size = preferredSize
+        file.createNewFile()
+        writer = PrintWriter(file.writer())
+        writer.println("time, body1_x, body1_y, body1_vx, body1_vy, body2_x, body2_y, body2_vx, body2_vy, body3_x, body3_y, body3_vx, body3_vy")
     }
 
-    private var bodies = initBodies
-
     override fun run() {
+
+        writer.print(totalTime)
+
         bodies.forEach {
+            writer.print(',')
+            writer.print(it.position.x)
+            writer.print(',')
+            writer.print(it.position.y)
+            writer.print(',')
+            writer.print(it.velocity.x)
+            writer.print(',')
+            writer.print(it.velocity.y)
+
             val (newPosition, newVelocity) = verlet(
                 it.position,
                 it.velocity,
@@ -59,6 +79,10 @@ class Simulation(
             it.position = newPosition
             it.velocity = newVelocity
         }
+
+        writer.println()
+        writer.flush()
+        totalTime += dt
     }
 
     override fun paintComponent(g: Graphics) {
