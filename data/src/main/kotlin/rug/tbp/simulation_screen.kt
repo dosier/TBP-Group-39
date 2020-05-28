@@ -3,7 +3,6 @@ package rug.tbp
 import rug.tbp.model.Body
 import rug.tbp.model.Simulation
 import rug.tbp.model.Vector
-import rug.tbp.util.massToRadius
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Dimension
@@ -53,8 +52,8 @@ fun main() {
             context.run()
             frame.repaint()
         })
-        timer.isRepeats = true;
-        timer.isCoalesce = true;
-        timer.start();
+        timer.isRepeats = true
+        timer.isCoalesce = true
+        timer.start()
     }
 }
