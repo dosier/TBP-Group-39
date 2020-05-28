@@ -32,7 +32,7 @@ fun main() {
     )
     val numTrailPts = 300
     val dt = 0.05
-    val simulation = Simulation(dt, initBodies, nPos = numTrailPts)
+    val simulation = Simulation(dt, initBodies, maxTrail = numTrailPts)
 
     SwingUtilities.invokeLater {
         val view = MainView(simulation)

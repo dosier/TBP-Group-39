@@ -42,7 +42,7 @@ class MainView(
     }
 
     fun start(){
-        timer.stop()
+        timer.start()
     }
 
     fun stop(){

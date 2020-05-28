@@ -8,6 +8,7 @@ import java.nio.file.Paths
 
 /**
  * TODO: add documentation
+ * TODO: on stop flush and close the writer
  *
  * based on https://github.com/ccampo133/NBodyJS/blob/master/src/main/kotlin/me/ccampo/nbody/model/SimulationContext.kt
  *
