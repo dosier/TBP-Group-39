@@ -24,23 +24,22 @@ import javax.swing.WindowConstants
 
 fun main() {
     val initBodies: Set<Body> = setOf(
-        Body(100000.0, massToRadius(100000.0),
-            Vector(0.0, 0.0),
+        Body(5.0,0.5,
+            Vector(1.0, -1.0),
             Vector(0.0, 0.0)
         ),
-        Body(75.0, massToRadius(75.0),
-            Vector(50.0, 0.0),
-            Vector(0.0, 45.0)
+        Body(3.0, 0.3,
+            Vector(1.0, 3.0),
+            Vector(0.0, 0.0)
         ),
-        Body(10000.0, massToRadius(10000.0),
-            Vector(220.0, 0.0),
-            Vector(0.0, 21.0)
+        Body(4.0, 0.4,
+            Vector(-2.0, -1.0),
+            Vector(0.0, 0.0)
         )
     )
-    val numTrailPts: Int = 1000
-    val dt = 2E-2
+    val numTrailPts = 300
+    val dt = 0.05
     val context = Simulation(dt, initBodies, nPos = numTrailPts)
-
 
     SwingUtilities.invokeLater {
         val frame = JFrame("TBP")

@@ -4,13 +4,13 @@ import rug.tbp.util.drawBody
 import rug.tbp.util.drawTrail
 import rug.tbp.util.gravityAcceleration
 import rug.tbp.util.verlet
-import java.awt.Color
-import java.awt.Dimension
-import java.awt.Graphics
-import java.awt.Graphics2D
+import java.awt.*
+import java.awt.geom.AffineTransform
 import java.io.PrintWriter
 import java.nio.file.Paths
 import javax.swing.JPanel
+import kotlin.math.roundToInt
+
 
 /**
  * TODO: add documentation
@@ -54,17 +54,10 @@ class Simulation(
 
     override fun run() {
 
-        writer.print(totalTime)
+        writeTime()
 
         bodies.forEach {
-            writer.print(',')
-            writer.print(it.position.x)
-            writer.print(',')
-            writer.print(it.position.y)
-            writer.print(',')
-            writer.print(it.velocity.x)
-            writer.print(',')
-            writer.print(it.velocity.y)
+            writePositionAndVelocity(it)
 
             val (newPosition, newVelocity) = verlet(
                 it.position,
@@ -80,18 +73,50 @@ class Simulation(
             it.velocity = newVelocity
         }
 
+        writeLine()
+        totalTime += dt
+    }
+
+    private fun writeLine() {
         writer.println()
         writer.flush()
-        totalTime += dt
+    }
+
+    private fun writeTime() {
+        writer.print(totalTime)
+    }
+
+    private fun writePositionAndVelocity(it: Body) {
+        writer.print(',')
+        writer.print(it.position.x)
+        writer.print(',')
+        writer.print(it.position.y)
+        writer.print(',')
+        writer.print(it.velocity.x)
+        writer.print(',')
+        writer.print(it.velocity.y)
     }
 
     override fun paintComponent(g: Graphics) {
         val g2d = g as Graphics2D
-        g2d.paint = Color.BLACK
-        g2d.fillRect(0, 0, width, height)
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+        g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY)
+        g2d.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY)
+
+        g2d.background = Color(44, 44, 44, 255)
+        g2d.clearRect(0, 0, width, height)
+        g2d.paint = Color.WHITE
+        g2d.drawString("Time: ${totalTime.roundToInt()} (dt = $dt)", 20, 20)
+        val tr2 = AffineTransform()
+        val zoom = 40.0
+        tr2.translate(
+                (this.width /2) - (width*(zoom))/2,
+                (this.height /2) - (height*(zoom))/2
+        )
+        tr2.scale(zoom,zoom)
         bodies.forEach {
-            g2d.drawTrail(it.lastPositions, it.radius, width, height)
-            g2d.drawBody(it, width, height)
+            g2d.drawTrail(tr2, it.lastPositions, it.radius, width, height)
+            g2d.drawBody(tr2, it, width, height)
         }
     }
 }
