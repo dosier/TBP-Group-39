@@ -15,11 +15,16 @@ import javax.swing.WindowConstants
  * @author  Stan van der Bend
  * @since   28/05/2020
  * @version 1.0
+ *
+ * @param context               the [Simulation]
+ * @param preferredRefreshDelay the preferred delay between each consecutive draw (not the same as [Simulation.dt])
  */
-class MainView(context: Simulation)
-    : JFrame("TBP") {
+class MainView(
+        context: Simulation,
+        preferredRefreshDelay: Int = 10
+) : JFrame("TBP") {
 
-    private val timer = Timer(2, ActionListener {
+    private val timer = Timer(preferredRefreshDelay, ActionListener {
         context.run()
         repaint()
     }).also {
@@ -37,7 +42,7 @@ class MainView(context: Simulation)
     }
 
     fun start(){
-        timer.start()
+        timer.stop()
     }
 
     fun stop(){
