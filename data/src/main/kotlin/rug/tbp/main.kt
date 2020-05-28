@@ -1,0 +1,41 @@
+package rug.tbp
+
+import rug.tbp.model.Body
+import rug.tbp.model.Simulation
+import rug.tbp.model.Vector
+import rug.tbp.view.MainView
+import javax.swing.SwingUtilities
+
+
+/**
+ * TODO: add documentation
+ *
+ * @author  Stan van der Bend
+ * @since   27/05/2020
+ * @version 1.0
+ */
+
+fun main() {
+    val initBodies: Set<Body> = setOf(
+        Body(5.0,0.5,
+            Vector(1.0, -1.0),
+            Vector(0.0, 0.0)
+        ),
+        Body(3.0, 0.3,
+            Vector(1.0, 3.0),
+            Vector(0.0, 0.0)
+        ),
+        Body(4.0, 0.4,
+            Vector(-2.0, -1.0),
+            Vector(0.0, 0.0)
+        )
+    )
+    val numTrailPts = 300
+    val dt = 0.05
+    val simulation = Simulation(dt, initBodies, nPos = numTrailPts)
+
+    SwingUtilities.invokeLater {
+        val view = MainView(simulation)
+        view.start()
+    }
+}
