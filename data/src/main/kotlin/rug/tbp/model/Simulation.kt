@@ -20,15 +20,13 @@ import java.nio.file.Paths
  * @param dt        the time interval for calculations
  * @param bodies    the set of [Body] objects
  * @param write     set to true if data should be written to a file
- * @param nPos      the number of historical positions to track, per body
- * @param nOld      the number of old bodies to track after they've been removed (collided, escaped, etc)
+ * @param maxTrail  the number of historical positions to track, per body
  */
 class Simulation(
         val dt: Double,
         var bodies: Set<Body> = emptySet(),
         private val write: Boolean = false,
-        private val nPos: Int = 0,
-        private val nOld: Int = 0
+        private val maxTrail: Int = 0
 ) : Runnable {
 
     var totalTime = 0.0
@@ -58,7 +56,7 @@ class Simulation(
                 gravityAcceleration(oldPosition, bodies - it)
             }
             it.lastPositions.addLast(it.position)
-            if(it.lastPositions.size >= nPos)
+            if(it.lastPositions.size >= maxTrail)
                 it.lastPositions.removeFirst()
             it.position = newPosition
             it.velocity = newVelocity
