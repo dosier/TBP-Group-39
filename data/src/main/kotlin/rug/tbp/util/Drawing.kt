@@ -19,8 +19,8 @@ import java.awt.geom.Line2D
 
 fun Graphics2D.drawBody(transform: AffineTransform, body: Body, width: Int, height: Int){
 
-    val x = (width.div(2) + body.position.x)
-    val y = (height.div(2) - body.position.y)
+    val x = (width.div(2) + body.position.x.toDouble())
+    val y = (height.div(2) - body.position.y.toDouble())
 
     paint = Color.WHITE
     fill(transform.createTransformedShape(Arc2D.Double(x, y, body.radius, body.radius, 0.0, 360.0, Arc2D.OPEN)))
@@ -38,8 +38,8 @@ fun Graphics2D.drawTrail(
         return
 
     val first = positions.first()
-    var x0 = (width.div(2) + radius + first.x)
-    var y0 = (height.div(2) - radius - first.y)
+    var x0 = (width.div(2) + radius + first.x.toDouble())
+    var y0 = (height.div(2) - radius - first.y.toDouble())
 
     var opacity = 0
     paint = Color(255, 255, 255, opacity)
@@ -51,8 +51,8 @@ fun Graphics2D.drawTrail(
             paint = Color(255, 255, 255, opacity)
             opacity = newOpacity
         }
-        val x1 = (width.div(2) + radius.div(2) + vector.x)
-        val y1 = (height.div(2) + radius.div(2) - vector.y)
+        val x1 = (width.div(2) + radius.div(2) + vector.x.toDouble())
+        val y1 = (height.div(2) + radius.div(2) - vector.y.toDouble())
         draw(transform.createTransformedShape(Line2D.Double(x0, y0, x1, y1)))
         x0 = x1
         y0 = y1

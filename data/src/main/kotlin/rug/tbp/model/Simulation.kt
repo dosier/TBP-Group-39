@@ -3,6 +3,7 @@ package rug.tbp.model
 import rug.tbp.util.gravityAcceleration
 import rug.tbp.util.verlet
 import java.io.PrintWriter
+import java.math.BigDecimal
 import java.nio.file.Paths
 
 
@@ -52,7 +53,7 @@ class Simulation(
             val (newPosition, newVelocity) = verlet(
                 it.position,
                 it.velocity,
-                dt
+                BigDecimal(dt)
             ) { oldPosition ->
                 gravityAcceleration(oldPosition, bodies - it)
             }

@@ -1,6 +1,8 @@
 package rug.tbp.model
 
+import rug.tbp.util.bigSqrt
 import java.awt.geom.Point2D
+import java.math.BigDecimal
 import kotlin.math.sqrt
 
 /**
@@ -10,9 +12,11 @@ import kotlin.math.sqrt
  * @since   27/05/2020
  * @version 1.0
  */
-data class Vector(val x: Double, val y: Double) {
+data class Vector(val x: BigDecimal, val y: BigDecimal) {
 
-    val length = sqrt(this * this)
+    constructor(x: Double, y: Double) : this(BigDecimal(x), BigDecimal(y))
+
+    val length = bigSqrt(this*this)
 
     operator fun plus(o: Vector) =
         Vector(x + o.x, y + o.y)
@@ -22,13 +26,13 @@ data class Vector(val x: Double, val y: Double) {
 
     operator fun times(o: Vector) = x*o.x + y*o.y
 
-    operator fun times(scalar: Double) = Vector(scalar * x, scalar * y)
+    operator fun times(scalar: BigDecimal) = Vector(scalar * x, scalar * y)
 
-    operator fun div(scalar: Double) = Vector(x / scalar, y / scalar)
+    operator fun div(scalar: BigDecimal) = Vector(x / scalar, y / scalar)
 
     fun toPoint() = Point2D.Float(x.toFloat(), y.toFloat())
 
     companion object {
-        val ZERO = Vector(0.0, 0.0)
+        val ZERO = Vector(BigDecimal(0.0), BigDecimal(0.0))
     }
 }

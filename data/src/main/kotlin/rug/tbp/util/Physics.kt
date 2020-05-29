@@ -1,15 +1,17 @@
 package rug.tbp.util
 
+import org.nevec.rjm.BigDecimalMath
 import rug.tbp.model.Body
 import rug.tbp.model.Vector
+import java.math.BigDecimal
 import kotlin.math.pow
 
 /**
  * https://github.com/ccampo133/NBodyJS/blob/master/src/main/kotlin/me/ccampo/nbody/util/Physics.kt
  */
 
-const val G = 1.0 // Gravitational constant
-const val SOFTENING_LENGTH = 2.0
+val G = BigDecimal(1.0) // Gravitational constant
+val SOFTENING_LENGTH = BigDecimal(2.0)
 
 /**
  * Numerically integrate Newton's equations of motion using the "Velocity Verlet" algorithm.
@@ -21,9 +23,9 @@ const val SOFTENING_LENGTH = 2.0
  * @param dt The timestep
  * @param a The acceleration function
  */
-fun verlet(x: Vector, v: Vector, dt: Double, a: (Vector) -> Vector): Pair<Vector, Vector> {
-    val x1 = (x + (v * dt)) + (a(x) * (dt.pow(2) / 2.0))
-    val v1 = v + ((a(x) + a(x1)) * (dt / 2))
+fun verlet(x: Vector, v: Vector, dt: BigDecimal, a: (Vector) -> Vector): Pair<Vector, Vector> {
+    val x1 = (x + (v * dt)) + (a(x) * (dt.pow(2) / BigDecimal(2.0)))
+    val v1 = v + ((a(x) + a(x1)) * (dt / BigDecimal(2)))
     return Pair(x1, v1)
 }
 
@@ -48,7 +50,9 @@ fun gravityAcceleration(x: Vector, bodies: Set<Body>): Vector {
      */
     fun gravity(pos: Vector, body2: Body): Vector {
         val r12 = body2.position - pos
-        return r12 * (body2.mass * G) / (r12.length.pow(2) + SOFTENING_LENGTH.pow(2)).pow(3 / 2.0)
+
+        return r12 * (body2.mass * G) / BigDecimalMath.pow(r12.length.pow(2) + SOFTENING_LENGTH.pow(2),
+                BigDecimal(3 / 2.0))
     }
     return bodies
         .map { body -> gravity(x, body) }
