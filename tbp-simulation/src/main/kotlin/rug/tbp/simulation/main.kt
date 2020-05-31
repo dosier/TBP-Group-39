@@ -1,9 +1,9 @@
-package rug.tbp
+package rug.tbp.simulation
 
-import rug.tbp.model.Body
-import rug.tbp.model.Simulation
-import rug.tbp.model.Vector
-import rug.tbp.view.MainView
+import rug.tbp.simulation.model.Body
+import rug.tbp.simulation.model.Simulation
+import rug.tbp.simulation.model.Vector
+import rug.tbp.simulation.view.MainView
 import javax.swing.SwingUtilities
 
 

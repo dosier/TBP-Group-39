@@ -1,4 +1,4 @@
-package rug.tbp.model
+package rug.tbp.simulation.model
 
 import java.util.ArrayDeque
 import kotlin.math.pow

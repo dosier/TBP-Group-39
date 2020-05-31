@@ -1,7 +1,7 @@
-package rug.tbp.model
+package rug.tbp.simulation.model
 
-import rug.tbp.util.gravityAcceleration
-import rug.tbp.util.verlet
+import rug.tbp.simulation.util.gravityAcceleration
+import rug.tbp.simulation.util.verlet
 import java.io.PrintWriter
 import java.nio.file.Paths
 

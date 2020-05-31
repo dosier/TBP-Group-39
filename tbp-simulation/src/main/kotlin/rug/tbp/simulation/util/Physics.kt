@@ -1,7 +1,7 @@
-package rug.tbp.util
+package rug.tbp.simulation.util
 
-import rug.tbp.model.Body
-import rug.tbp.model.Vector
+import rug.tbp.simulation.model.Body
+import rug.tbp.simulation.model.Vector
 import kotlin.math.pow
 
 /**

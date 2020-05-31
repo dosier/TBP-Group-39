@@ -1,3 +1,4 @@
 rootProject.name = "TBP-Group-39"
 
-include("data")
+include("tbp-simulation")
+include("tbp-neural-network")

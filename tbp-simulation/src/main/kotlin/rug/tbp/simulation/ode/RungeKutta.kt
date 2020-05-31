@@ -1,12 +1,7 @@
-package rug.tbp.ode
+package rug.tbp.simulation.ode
 
 typealias dy_dx = (Double, Double) -> Double
 
-fun main() {
-    val f: dy_dx = { x, y -> x.minus(y).div(2) }
-    // might wanna use this instead of the verlet algorithm
-
-}
 
 fun solveRungeKutta(f: dy_dx, x0: Double, y0: Double, x: Double, h: Double): Double{
 

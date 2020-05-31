@@ -1,4 +1,4 @@
-package rug.tbp.model
+package rug.tbp.simulation.model
 
 import java.awt.geom.Point2D
 import kotlin.math.sqrt

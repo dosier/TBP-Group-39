@@ -1,8 +1,8 @@
-package rug.tbp.view
+package rug.tbp.simulation.view
 
-import rug.tbp.model.Simulation
-import rug.tbp.util.drawBody
-import rug.tbp.util.drawTrail
+import rug.tbp.simulation.model.Simulation
+import rug.tbp.simulation.util.drawBody
+import rug.tbp.simulation.util.drawTrail
 import java.awt.*
 import java.awt.geom.AffineTransform
 import javax.swing.JPanel

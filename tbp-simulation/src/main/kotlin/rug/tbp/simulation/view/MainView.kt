@@ -1,6 +1,6 @@
-package rug.tbp.view
+package rug.tbp.simulation.view
 
-import rug.tbp.model.Simulation
+import rug.tbp.simulation.model.Simulation
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Dimension
