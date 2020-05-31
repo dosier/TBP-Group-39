@@ -20,8 +20,8 @@ fun main() {
 
     val initBodies = createSet(1.0, 0.2, Vector(1.0, 0.0))
 
-    val numTrailPts = 300
-    val dt = 0.05
+    val numTrailPts = 200
+    val dt = 0.01
     val simulation = Simulation(dt, initBodies, write = false, maxTrail = numTrailPts)
 
     SwingUtilities.invokeLater {
