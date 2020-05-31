@@ -28,6 +28,22 @@ fun verlet(x: Vector, v: Vector, dt: Double, a: (Vector) -> Vector): Pair<Vector
 }
 
 /**
+ * Newton's Law of Gravity. Here we're only returning the acceleration vector, not the force vector, according to
+ * Newton's second law (F = ma)
+ *
+ * Also, a "softening length" is applied to modify gravitational interactions at small scales, avoiding a singularity
+ * and hence crazy accelerations.
+ *
+ * See: http://www.scholarpedia.org/article/N-body_simulations_(gravitational)
+ */
+fun gravity(pos: Vector, body: Body): Vector {
+
+    val d = body.position - pos
+
+    return d * (body.mass * G)/ (d.length.pow(2) + SOFTENING_LENGTH.pow(2)).pow(3 / 2.0)
+}
+
+/**
  * Using Newton's law of universal gravitation, calculate the total acceleration vector on a two-dimension position
  * vector caused by a set of massive bodies.
  *
@@ -37,19 +53,7 @@ fun verlet(x: Vector, v: Vector, dt: Double, a: (Vector) -> Vector): Pair<Vector
  * @param bodies The set of bodies to used to contribute to the overall gravitational acceleration.
  */
 fun gravityAcceleration(x: Vector, bodies: Set<Body>): Vector {
-    /*
-     * Newton's Law of Gravity. Here we're only returning the acceleration vector, not the force vector, according to
-     * Newton's second law (F = ma)
-     *
-     * Also, a "softening length" is applied to modify gravitational interactions at small scales, avoiding a singularity
-     * and hence crazy accelerations.
-     *
-     * See: http://www.scholarpedia.org/article/N-body_simulations_(gravitational)
-     */
-    fun gravity(pos: Vector, body2: Body): Vector {
-        val r12 = body2.position - pos
-        return r12 * (body2.mass * G) / (r12.length.pow(2) + SOFTENING_LENGTH.pow(2)).pow(3 / 2.0)
-    }
+
     return bodies
         .map { body -> gravity(x, body) }
         .fold(Vector.ZERO) { a1, a2 -> a1 + a2 }

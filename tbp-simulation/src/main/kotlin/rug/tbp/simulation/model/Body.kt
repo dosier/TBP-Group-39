@@ -1,5 +1,6 @@
 package rug.tbp.simulation.model
 
+import jetbrains.datalore.base.typedGeometry.Vec
 import java.util.ArrayDeque
 import kotlin.math.pow
 
@@ -14,7 +15,7 @@ data class Body(
     val mass: Double,
     val radius: Double,
     var position: Vector,
-    var velocity: Vector
+    var velocity: Vector = Vector(0.0, 0.0)
 ) {
     val lastPositions = ArrayDeque<Vector>()
     fun getMomentum() = velocity * mass

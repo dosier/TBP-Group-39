@@ -26,7 +26,10 @@ data class Vector(val x: Double, val y: Double) {
 
     operator fun div(scalar: Double) = Vector(x / scalar, y / scalar)
 
+    operator fun unaryMinus() = Vector(-x, -y)
+
     fun toPoint() = Point2D.Float(x.toFloat(), y.toFloat())
+
 
     companion object {
         val ZERO = Vector(0.0, 0.0)
