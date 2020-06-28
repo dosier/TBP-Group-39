@@ -1,7 +1,7 @@
 package rug.tbp.simulation
 
 import rug.tbp.simulation.model.Body
-import rug.tbp.simulation.model.Simulation
+import rug.tbp.simulation.model.RealTimeSimulation
 import rug.tbp.simulation.model.Vector
 import rug.tbp.simulation.util.randomSemiUnitCirclePoint
 import rug.tbp.simulation.view.MainView
@@ -22,7 +22,7 @@ fun main() {
 
     val numTrailPts = 200
     val dt = 0.01
-    val simulation = Simulation(dt, initBodies, write = false, maxTrail = numTrailPts)
+    val simulation = RealTimeSimulation(dt, initBodies, write = false, maxTrail = numTrailPts)
 
     SwingUtilities.invokeLater {
         val view = MainView(simulation)

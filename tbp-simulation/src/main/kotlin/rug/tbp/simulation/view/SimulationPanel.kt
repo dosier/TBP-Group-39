@@ -1,5 +1,6 @@
 package rug.tbp.simulation.view
 
+import rug.tbp.simulation.model.RealTimeSimulation
 import rug.tbp.simulation.model.Simulation
 import rug.tbp.simulation.util.drawBody
 import rug.tbp.simulation.util.drawTrail
@@ -15,7 +16,7 @@ import kotlin.math.roundToInt
  * @since   28/05/2020
  * @version 1.0
  *
- * @param simulation    the [Simulation]
+ * @param simulation    the [RealTimeSimulation]
  * @param zoom          a scaling multiplier (applied to bodies and their trails)
  * @param areaWidth     the simulation area width
  * @param areaHeight    the simulation area height

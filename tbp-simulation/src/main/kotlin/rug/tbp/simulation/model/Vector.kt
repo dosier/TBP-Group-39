@@ -1,6 +1,7 @@
 package rug.tbp.simulation.model
 
 import java.awt.geom.Point2D
+import kotlin.math.pow
 import kotlin.math.sqrt
 
 /**
@@ -27,6 +28,8 @@ data class Vector(val x: Double, val y: Double) {
     operator fun div(scalar: Double) = Vector(x / scalar, y / scalar)
 
     operator fun unaryMinus() = Vector(-x, -y)
+
+    fun toNorm() = sqrt((x*x) + (y*y))
 
     fun toPoint() = Point2D.Float(x.toFloat(), y.toFloat())
 

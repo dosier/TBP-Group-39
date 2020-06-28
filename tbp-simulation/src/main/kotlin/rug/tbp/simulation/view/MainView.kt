@@ -1,5 +1,6 @@
 package rug.tbp.simulation.view
 
+import rug.tbp.simulation.model.RealTimeSimulation
 import rug.tbp.simulation.model.Simulation
 import java.awt.BorderLayout
 import java.awt.Color
@@ -16,12 +17,12 @@ import javax.swing.WindowConstants
  * @since   28/05/2020
  * @version 1.0
  *
- * @param context               the [Simulation]
- * @param preferredRefreshDelay the preferred delay between each consecutive draw (not the same as [Simulation.dt])
+ * @param context               the [RealTimeSimulation]
+ * @param preferredRefreshDelay the preferred delay between each consecutive draw (not the same as [RealTimeSimulation.dt])
  */
 class MainView(
-        context: Simulation,
-        preferredRefreshDelay: Int = 10
+    context: Simulation,
+    preferredRefreshDelay: Int = 10
 ) : JFrame("TBP") {
 
     private val timer = Timer(preferredRefreshDelay, ActionListener {
