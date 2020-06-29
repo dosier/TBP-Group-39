@@ -1,13 +1,13 @@
 package rug.tbp.simulation.view
 
-import rug.tbp.simulation.model.RealTimeSimulation
 import rug.tbp.simulation.model.Simulation
+import rug.tbp.simulation.util.round
 import rug.tbp.simulation.util.drawBody
 import rug.tbp.simulation.util.drawTrail
+import rug.tbp.simulation.util.drawXYAxis
 import java.awt.*
 import java.awt.geom.AffineTransform
 import javax.swing.JPanel
-import kotlin.math.roundToInt
 
 /**
  * TODO: add documentation
@@ -21,11 +21,12 @@ import kotlin.math.roundToInt
  * @param areaWidth     the simulation area width
  * @param areaHeight    the simulation area height
  */
-class SimulationPanel(private val simulation: Simulation,
-                      private val zoom: Double = 40.0,
+class SimulationPanel(private val zoom: Double = 100.0,
                       areaWidth: Int = 100,
                       areaHeight: Int = 100)
     : JPanel() {
+
+    var simulation: Simulation? = null
 
     private fun createTransform() = AffineTransform().also {
         it.translate(
@@ -42,6 +43,8 @@ class SimulationPanel(private val simulation: Simulation,
 
     override fun paintComponent(g: Graphics) {
 
+        val sim = simulation?:return
+
         val g2d = g as Graphics2D
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
         g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY)
@@ -51,10 +54,11 @@ class SimulationPanel(private val simulation: Simulation,
         g2d.clearRect(0, 0, width, height)
 
         g2d.paint = Color.WHITE
-        g2d.drawString("Time: ${simulation.totalTime.roundToInt()} (dt = ${simulation.dt})", 20, 20)
+        g2d.drawString("Time: ${sim.totalTime.round(3)} (dt = ${sim.dt})", 20, 20)
 
         val transform = createTransform()
-        simulation.bodies.forEach {
+        sim.bodies.forEach {
+            g2d.drawXYAxis()
             g2d.drawTrail(transform, it.lastPositions, it.radius, width, height)
             g2d.drawBody(transform, it, width, height)
         }

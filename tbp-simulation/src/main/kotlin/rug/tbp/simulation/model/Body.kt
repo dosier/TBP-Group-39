@@ -1,7 +1,6 @@
 package rug.tbp.simulation.model
 
-import jetbrains.datalore.base.typedGeometry.Vec
-import java.util.ArrayDeque
+import java.util.*
 import kotlin.math.pow
 
 /**

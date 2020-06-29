@@ -24,6 +24,18 @@ fun Graphics2D.drawBody(transform: AffineTransform, body: Body, width: Int, heig
 
     paint = Color.WHITE
     fill(transform.createTransformedShape(Arc2D.Double(x, y, body.radius, body.radius, 0.0, 360.0, Arc2D.OPEN)))
+
+//    drawString("(${body.position.x}, ${body.position.y}) - (${body.velocity.x}, ${body.velocity.y})", x.toInt(), y.toInt())
+}
+
+fun Graphics2D.drawXYAxis(){
+
+    val centerX = clip.bounds.centerX.toInt()
+    val centerY = clip.bounds.centerY.toInt()
+
+    drawLine(0, centerY, clip.bounds.width, centerY)
+    drawLine(centerX, 0, centerX, clip.bounds.height)
+
 }
 
 fun Graphics2D.drawTrail(
