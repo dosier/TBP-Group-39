@@ -5,6 +5,7 @@ import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.event.ActionListener
+import java.nio.file.Path
 import java.nio.file.Paths
 import javax.swing.JFrame
 import javax.swing.Timer
@@ -18,10 +19,10 @@ import javax.swing.WindowConstants
  * @since   28/05/2020
  * @version 1.0
  *
- * @param context               the [RealTimeSimulation]
+ * @param path                  the [Path] to the data folder
  * @param preferredRefreshDelay the preferred delay between each consecutive draw (not the same as [RealTimeSimulation.dt])
  */
-class MainView(preferredRefreshDelay: Int = 10) : JFrame("TBP") {
+class MainView(path: Path, preferredRefreshDelay: Int = 10) : JFrame("TBP") {
 
     val simulater = SimulationPanel()
 
@@ -51,11 +52,15 @@ class MainView(preferredRefreshDelay: Int = 10) : JFrame("TBP") {
         buttonPanel.pauseButton.addActionListener {
             timer.stop()
         }
+        buttonPanel.drawAxisBox.addActionListener {
+            simulater.drawAxis = buttonPanel.drawAxisBox.isSelected
+        }
+        buttonPanel.refreshSlider.value = preferredRefreshDelay
         buttonPanel.refreshSlider.addChangeListener {
             timer.delay = buttonPanel.refreshSlider.value
         }
 
-        val explorer = FileExplorerPanel(Paths.get("cleaned_data").toFile())
+        val explorer = FileExplorerPanel(path.toFile())
         explorer.tree.addTreeSelectionListener {
 
             val dirName = it.path.parentPath.lastPathComponent.toString()

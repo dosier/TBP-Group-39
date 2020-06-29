@@ -21,17 +21,18 @@ import javax.swing.JPanel
  * @param areaWidth     the simulation area width
  * @param areaHeight    the simulation area height
  */
-class SimulationPanel(private val zoom: Double = 100.0,
+class SimulationPanel(var zoom: Double = 100.0,
                       areaWidth: Int = 100,
                       areaHeight: Int = 100)
     : JPanel() {
 
     var simulation: Simulation? = null
+    var drawAxis = false
 
-    private fun createTransform() = AffineTransform().also {
+    private fun createTransform(bounds: Rectangle) = AffineTransform().also {
         it.translate(
-                (this.width / 2) - (width * (zoom)) / 2,
-                (this.height / 2) - (height * (zoom)) / 2
+                (bounds.width / 2) - (bounds.width * (zoom)) / 2,
+                (bounds.height / 2) - (bounds.height * (zoom)) / 2
         )
         it.scale(zoom, zoom)
     }
@@ -50,17 +51,19 @@ class SimulationPanel(private val zoom: Double = 100.0,
         g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY)
         g2d.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY)
 
+        val bounds = g2d.clipBounds
         g2d.background = Color(44, 44, 44, 255)
-        g2d.clearRect(0, 0, width, height)
+        g2d.clearRect(0, 0, bounds.width, bounds.height)
 
         g2d.paint = Color.WHITE
         g2d.drawString("Time: ${sim.totalTime.round(3)} (dt = ${sim.dt})", 20, 20)
 
-        val transform = createTransform()
+        val transform = createTransform(bounds)
         sim.bodies.forEach {
-            g2d.drawXYAxis()
-            g2d.drawTrail(transform, it.lastPositions, it.radius, width, height)
-            g2d.drawBody(transform, it, width, height)
+            if(drawAxis)
+                g2d.drawXYAxis()
+            g2d.drawTrail(transform, it.lastPositions, it.radius)
+            g2d.drawBody(transform, it)
         }
     }
 }

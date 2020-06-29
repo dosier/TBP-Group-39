@@ -17,15 +17,19 @@ import java.awt.geom.Line2D
  * @version 1.0
  */
 
-fun Graphics2D.drawBody(transform: AffineTransform, body: Body, width: Int, height: Int){
+fun Graphics2D.drawBody(
+    transform: AffineTransform,
+    body: Body
+){
 
-    val x = (width.div(2) + body.position.x)
-    val y = (height.div(2) - body.position.y)
-
+    val x = (clip.bounds.width.div(2) + body.position.x)
+    val y = (clip.bounds.height.div(2) - body.position.y)
+    val shape = transform.createTransformedShape(Arc2D.Double(x, y, body.radius, body.radius, 0.0, 360.0, Arc2D.OPEN))
     paint = Color.WHITE
-    fill(transform.createTransformedShape(Arc2D.Double(x, y, body.radius, body.radius, 0.0, 360.0, Arc2D.OPEN)))
+    fill(shape)
 
-//    drawString("(${body.position.x}, ${body.position.y}) - (${body.velocity.x}, ${body.velocity.y})", x.toInt(), y.toInt())
+    paint = Color.CYAN
+    drawString("${body.position.x.round(3)}, ${body.position.y.round(3)}", shape.bounds.maxX.toInt(), shape.bounds.maxY.toInt())
 }
 
 fun Graphics2D.drawXYAxis(){
@@ -39,15 +43,16 @@ fun Graphics2D.drawXYAxis(){
 }
 
 fun Graphics2D.drawTrail(
-        transform: AffineTransform,
-        positions: Collection<Vector>,
-        radius: Double,
-        width: Int,
-        height: Int
+    transform: AffineTransform,
+    positions: Collection<Vector>,
+    radius: Double
 ){
 
     if(positions.isEmpty())
         return
+
+    val width = clipBounds.width
+    val height = clipBounds.height
 
     val first = positions.first()
     var x0 = (width.div(2) + radius + first.x)

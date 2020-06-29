@@ -33,6 +33,21 @@ data class Vector(val x: Double, val y: Double) {
 
     fun toPoint() = Point2D.Float(x.toFloat(), y.toFloat())
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Vector) return false
+
+        if (x != other.x) return false
+        if (y != other.y) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = x.hashCode()
+        result = 31 * result + y.hashCode()
+        return result
+    }
 
     companion object {
         val ZERO = Vector(0.0, 0.0)

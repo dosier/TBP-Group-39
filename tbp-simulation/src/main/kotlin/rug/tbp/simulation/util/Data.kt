@@ -17,6 +17,39 @@ fun main() {
 
 }
 
+private fun findCollisions(){
+    val files = Paths.get("cleaned_data").toFile()
+        .listFiles()!!
+        .filter { it.extension == "csv" }
+
+    total = files.size
+
+    val collidedFiles = HashSet<String>()
+
+    files.stream().parallel().forEach {
+        val lines = it.readLines()
+        for(line in lines) {
+            val split = line.split(",")
+            val body1Pos = split.readVector(1)
+            val body2Pos = split.readVector(3)
+            val body3Pos = split.readVector(5)
+            if(body1Pos == body2Pos || body1Pos == body3Pos || body2Pos == body3Pos){
+                synchronized(collidedFiles) {
+                    collidedFiles.add(it.name)
+                }
+            }
+        }
+        val count = atomicCounter.incrementAndGet()
+        if(count % 10 == 0)
+            println("Finished parsing $count/$total data sets!")
+    }
+
+    println("Counted ${collidedFiles.size} files with a collision")
+
+    for(file in collidedFiles)
+        println(file)
+}
+
 private fun cleanAllData() {
     val files = Paths.get("/Users/stanvanderbend/Documents/MATLAB/Three body problem/data/").toFile()
         .listFiles()!!
