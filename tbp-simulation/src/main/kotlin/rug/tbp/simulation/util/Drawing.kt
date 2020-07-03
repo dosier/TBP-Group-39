@@ -29,7 +29,7 @@ fun Graphics2D.drawBody(
     fill(shape)
 
     paint = Color.CYAN
-    drawString("${body.position.x.round(3)}, ${body.position.y.round(3)}", shape.bounds.maxX.toInt(), shape.bounds.maxY.toInt())
+//    drawString("${body.position.x.round(3)}, ${body.position.y.round(3)}", shape.bounds.maxX.toInt(), shape.bounds.maxY.toInt())
 }
 
 fun Graphics2D.drawXYAxis(){

@@ -21,18 +21,33 @@ class DataSimulation(file: File, bodies: List<Body> = emptyList()) : Simulation(
 
         val lines = file.readLines()
 
+        var t = 0.0
+
         for(line in lines){
+
+            if(line.contains("x"))
+                continue
+
             val split = line.split(',')
-            val t = split[0].toDouble()
+
+            val offset: Int
+            if(split.size == 13) {
+                t = split[0].toDouble()
+                offset = 1
+            }  else
+                offset = 0
+
             val ys = arrayOf(
-                split.readVector(1),
-                split.readVector(3),
-                split.readVector(5),
-                split.readVector(7),
-                split.readVector(9),
-                split.readVector(11)
+                split.readVector(offset),
+                split.readVector(offset+2),
+                split.readVector(offset+4),
+                split.readVector(offset+6),
+                split.readVector(offset+8),
+                split.readVector(offset+10)
             )
+
             timeMap.addLast(Pair(t, ys))
+            t += 0.01
         }
 
         originalMap = timeMap.clone()

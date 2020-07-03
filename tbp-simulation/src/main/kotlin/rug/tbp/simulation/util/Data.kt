@@ -13,21 +13,92 @@ var total = 0
 val atomicCounter = AtomicInteger(0)
 val totalLinesReduced = AtomicInteger(0)
 
+val collidedFiles = HashSet<String>()
+val stuckFiles = HashSet<String>()
+
+val rawPath = Paths.get("/Users/stanvanderbend/Documents/MATLAB/Three body problem/data/")
+
 fun main() {
-
+    syncDataToConstantTimeStep()
+    detectAndCacheCollisions()
+    prepareDataForModel()
 }
+private fun syncDataToConstantTimeStep() {
+    val files = rawPath.toFile()
+        .listFiles()!!
+        .filter { it.extension == "txt" }
 
-private fun findCollisions(){
+    total = files.size
+
+    files.stream()
+        .parallel()
+        .forEach { syncDataInFileToConstantTimeStep(it) }
+
+    println("Finished cleaning all the data sets, reduced a total of ${totalLinesReduced.get()} lines.")
+}
+private fun syncDataInFileToConstantTimeStep(input: File){
+
+    val lines = input.readLines()
+
+    val preCleanLineCount = lines.size
+
+    val timeMap = HashMap<Double, String>()
+
+    for(line in lines){
+        val bloop = line.split(',')[0]
+
+        val t = bloop.toDouble()
+
+        timeMap[t] = line.substringAfter(bloop)
+    }
+
+    val output = Paths.get("cleaned_data", input.nameWithoutExtension+"_cleaned.csv").toFile()
+    val writer = output.printWriter()
+    output.createNewFile()
+
+    val dt = 0.01
+    val tEnd = 10.0
+    var nextT = 0.0
+
+    // iterates 1001 times
+    while (nextT < tEnd){
+
+        val closestT = timeMap.keys.minBy { originalT -> abs(originalT-nextT) }!!
+        val line = "${nextT.round(3)}"+timeMap[closestT]
+
+        nextT += dt
+
+        if(nextT >= tEnd)
+            writer.print(line)
+        else
+            writer.println(line)
+    }
+
+    writer.flush()
+    writer.close()
+
+    totalLinesReduced.addAndGet(preCleanLineCount-1001)
+
+    val count = atomicCounter.incrementAndGet()
+
+    if(count % 10 == 0)
+        println("Finished cleaning $count/$total data sets!")
+}
+private fun detectAndCacheCollisions(){
     val files = Paths.get("cleaned_data").toFile()
         .listFiles()!!
         .filter { it.extension == "csv" }
 
     total = files.size
 
-    val collidedFiles = HashSet<String>()
-
     files.stream().parallel().forEach {
         val lines = it.readLines()
+
+        var prev1 : Vector? = null
+        var prev2 : Vector? = null
+        var prev3 : Vector? = null
+        var stuckCount = 0
+
         for(line in lines) {
             val split = line.split(",")
             val body1Pos = split.readVector(1)
@@ -38,7 +109,24 @@ private fun findCollisions(){
                     collidedFiles.add(it.name)
                 }
             }
+            val checkStuck = prev1 != null
+            if(checkStuck){
+                if(prev1 == body1Pos && prev2 == body2Pos && prev3 == body3Pos)
+                    stuckCount++
+                else
+                    stuckCount = 0
+            }
+            prev1 = body1Pos
+            prev2 = body2Pos
+            prev3 = body3Pos
         }
+
+        if(stuckCount > 5){
+            synchronized(stuckFiles){
+                stuckFiles.add(it.name)
+            }
+        }
+
         val count = atomicCounter.incrementAndGet()
         if(count % 10 == 0)
             println("Finished parsing $count/$total data sets!")
@@ -48,21 +136,47 @@ private fun findCollisions(){
 
     for(file in collidedFiles)
         println(file)
-}
 
-private fun cleanAllData() {
-    val files = Paths.get("/Users/stanvanderbend/Documents/MATLAB/Three body problem/data/").toFile()
+    println("Counted ${collidedFiles.size} files that got stuck for more than 5 time steps")
+
+    for(file in stuckFiles)
+        println(file)
+}
+private fun prepareDataForModel() {
+    val files = Paths.get("cleaned_data").toFile()
         .listFiles()!!
-        .filter { it.extension == "txt" }
+        .filter { it.extension == "csv" && !collidedFiles.contains(it.name) && !stuckFiles.contains(it.name) }
 
-    total = files.size
+    atomicCounter.set(0)
+    total = files.size.coerceAtMost(5000)
 
-    files.stream()
-        .parallel()
-        .forEach { cleanData(it) }
+    files.stream().limit(total.toLong()).parallel().forEach {
 
-    println("Finished cleaning all the data sets, reduced a total of ${totalLinesReduced.get()} lines.")
+        val lines = it.readLines()
+
+        val output = Paths.get("ready_data", it.nameWithoutExtension + ".csv").toFile()
+        val writer = output.printWriter()
+        output.createNewFile()
+
+        writer.println("x1,y1,vx1,vy1,x2,y2,vx2,vy2,x3,y3,vx3,vy3")
+
+        for ((i, line) in lines.withIndex()) {
+            val omittedLine = line.substringAfter(',')
+            if (i == lines.size - 1)
+                writer.print(omittedLine)
+            else
+                writer.println(omittedLine)
+        }
+        writer.flush()
+        writer.close()
+
+        val count = atomicCounter.incrementAndGet()
+
+        if (count % 10 == 0)
+            println("Finished cleaning $count/$total data sets!")
+    }
 }
+
 
 private fun evaluateData(input: File) {
 
@@ -159,55 +273,6 @@ private fun evaluateData(input: File) {
 
     println("minDiffX = $minDiffX")
     println("minDiffY = $minDiffY")
-}
-
-fun cleanData(input: File){
-
-    val lines = input.readLines()
-
-    val preCleanLineCount = lines.size
-
-    val timeMap = HashMap<Double, String>()
-
-    for(line in lines){
-        val bloop = line.split(',')[0]
-
-        val t = bloop.toDouble()
-
-        timeMap[t] = line.substringAfter(bloop)
-    }
-
-    val output = Paths.get("cleaned_data", input.nameWithoutExtension+"_cleaned.csv").toFile()
-    val writer = output.printWriter()
-    output.createNewFile()
-
-    val dt = 0.01
-    val tEnd = 10.0
-    var nextT = 0.0
-
-    // iterates 1001 times
-    while (nextT < tEnd){
-
-        val closestT = timeMap.keys.minBy { originalT -> abs(originalT-nextT) }!!
-        val line = "${nextT.round(3)}"+timeMap[closestT]
-
-        nextT += dt
-
-        if(nextT >= tEnd)
-            writer.print(line)
-        else
-            writer.println(line)
-    }
-
-    writer.flush()
-    writer.close()
-
-    totalLinesReduced.addAndGet(preCleanLineCount-1001)
-
-    val count = atomicCounter.incrementAndGet()
-
-    if(count % 10 == 0)
-        println("Finished cleaning $count/$total data sets!")
 }
 
 fun Double.round(decimals: Int): Double {
