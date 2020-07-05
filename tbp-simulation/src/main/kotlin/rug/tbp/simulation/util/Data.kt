@@ -16,18 +16,78 @@ val totalLinesReduced = AtomicInteger(0)
 val collidedFiles = HashSet<String>()
 val stuckFiles = HashSet<String>()
 
+/**
+ * Points to the directory that contains the files that are 'cleaned' up,
+ * that is to say, formatted in a way that is faster to process.
+ * This is supposed to be an intermediary step and data in this format
+ * should not be used directly to train the model.
+ **/
+val cleanedDataDir: File = Paths.get("cleaned_data").toFile()
+/**
+ * Contains files that are 'cleaned' up, that is to say, formatted in a way that is
+ * faster to process. This is supposed to be an intermediary step and data in this format
+ * should not be used directly to train the model.
+ **/
+val readyDataDir: File  = Paths.get("ready_data").toFile()
+
 val rawPath = Paths.get("/Users/stanvanderbend/Documents/MATLAB/Three body problem/data/")
+val trainFile = Paths.get("/Users/stanvanderbend/PycharmProjects/TBP-Group-39/train_data.csv").toFile()
+val testFile = Paths.get("/Users/stanvanderbend/PycharmProjects/TBP-Group-39/test_data.csv").toFile()
+
+const val tFinal = 3.9
+const val maxAmountStuck = 4
+const val maxFiles = 10_000
+const val trainTestRatio = 0.8
 
 fun main() {
-    syncDataToConstantTimeStep()
-    detectAndCacheCollisions()
-    prepareDataForModel()
+//    syncDataToConstantTimeStep()
+//    detectAndCacheCollisions()
+//    prepareDataForModel()
+    saveDataToModelPath()
 }
+
+private fun saveDataToModelPath(){
+
+    val files = readyDataDir.readAllCSVFiles()
+
+    atomicCounter.set(0)
+    total = files.size
+
+    val totalTrain = (total * 0.8).toInt()
+    val totalTest = total-totalTrain
+
+    trainFile.writeText("x1,y1,vx1,vy1,x2,y2,vx2,vy2,x3,y3,vx3,vy3\n")
+    testFile.writeText("x1,y1,vx1,vy1,x2,y2,vx2,vy2,x3,y3,vx3,vy3\n")
+
+    for((i, file) in files.withIndex()){
+
+        val text =  file.readText().substringAfter('\n')
+
+        val outFile = if(i < totalTrain)
+            trainFile
+        else
+            testFile
+
+        outFile.appendText(text)
+
+        if(i < total-1)
+            outFile.appendText("\n")
+
+        val count = atomicCounter.incrementAndGet()
+
+        if(count % 1000 == 0)
+            println("Finished copying over $count/$total data sets!")
+    }
+
+    println("Total train data = $totalTrain, total test data = $totalTest")
+}
+
 private fun syncDataToConstantTimeStep() {
     val files = rawPath.toFile()
         .listFiles()!!
         .filter { it.extension == "txt" }
 
+    atomicCounter.set(0)
     total = files.size
 
     files.stream()
@@ -57,7 +117,7 @@ private fun syncDataInFileToConstantTimeStep(input: File){
     output.createNewFile()
 
     val dt = 0.01
-    val tEnd = 10.0
+    val tEnd = tFinal
     var nextT = 0.0
 
     // iterates 1001 times
@@ -85,10 +145,9 @@ private fun syncDataInFileToConstantTimeStep(input: File){
         println("Finished cleaning $count/$total data sets!")
 }
 private fun detectAndCacheCollisions(){
-    val files = Paths.get("cleaned_data").toFile()
-        .listFiles()!!
-        .filter { it.extension == "csv" }
+    val files = cleanedDataDir.readAllCSVFiles()
 
+    atomicCounter.set(0)
     total = files.size
 
     files.stream().parallel().forEach {
@@ -115,46 +174,45 @@ private fun detectAndCacheCollisions(){
                     stuckCount++
                 else
                     stuckCount = 0
+                if(stuckCount >= maxAmountStuck){
+                    synchronized(stuckFiles){
+                        stuckFiles.add(it.name)
+                    }
+                    break
+                }
             }
             prev1 = body1Pos
             prev2 = body2Pos
             prev3 = body3Pos
         }
 
-        if(stuckCount > 5){
-            synchronized(stuckFiles){
-                stuckFiles.add(it.name)
-            }
-        }
-
         val count = atomicCounter.incrementAndGet()
-        if(count % 10 == 0)
+        if(count % 1000 == 0)
             println("Finished parsing $count/$total data sets!")
     }
 
     println("Counted ${collidedFiles.size} files with a collision")
 
-    for(file in collidedFiles)
-        println(file)
-
-    println("Counted ${collidedFiles.size} files that got stuck for more than 5 time steps")
+    println("Counted ${collidedFiles.size} files that got stuck for >= $maxAmountStuck time steps")
 
     for(file in stuckFiles)
         println(file)
 }
 private fun prepareDataForModel() {
-    val files = Paths.get("cleaned_data").toFile()
-        .listFiles()!!
-        .filter { it.extension == "csv" && !collidedFiles.contains(it.name) && !stuckFiles.contains(it.name) }
+    val files = cleanedDataDir
+        .readAllCSVFiles()
+        .filter {
+            !collidedFiles.contains(it.name) && !stuckFiles.contains(it.name)
+        }
 
     atomicCounter.set(0)
-    total = files.size.coerceAtMost(5000)
+    total = files.size.coerceAtMost(maxFiles)
 
     files.stream().limit(total.toLong()).parallel().forEach {
 
         val lines = it.readLines()
 
-        val output = Paths.get("ready_data", it.nameWithoutExtension + ".csv").toFile()
+        val output = readyDataDir.toPath().resolve(it.nameWithoutExtension + ".csv").toFile()
         val writer = output.printWriter()
         output.createNewFile()
 
@@ -172,7 +230,7 @@ private fun prepareDataForModel() {
 
         val count = atomicCounter.incrementAndGet()
 
-        if (count % 10 == 0)
+        if (count % 1000 == 0)
             println("Finished cleaning $count/$total data sets!")
     }
 }
@@ -279,4 +337,9 @@ fun Double.round(decimals: Int): Double {
     var multiplier = 1.0
     repeat(decimals) { multiplier *= 10 }
     return round(this * multiplier) / multiplier
+}
+
+fun File.readAllCSVFiles(): List<File> {
+    return this.listFiles()!!
+        .filter { it.extension == "csv" }
 }
