@@ -6,7 +6,12 @@ import rug.tbp.simulation.util.drawBody
 import rug.tbp.simulation.util.drawTrail
 import rug.tbp.simulation.util.drawXYAxis
 import java.awt.*
+import java.awt.datatransfer.DataFlavor
+import java.awt.dnd.DnDConstants
+import java.awt.dnd.DropTarget
+import java.awt.dnd.DropTargetDropEvent
 import java.awt.geom.AffineTransform
+import java.io.File
 import javax.swing.JPanel
 
 /**

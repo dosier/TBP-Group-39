@@ -63,14 +63,20 @@ class MainView(path: Path, preferredRefreshDelay: Int = 10) : JFrame("TBP") {
         val explorer = FileExplorerPanel(path.toFile())
         explorer.tree.addTreeSelectionListener {
 
-            val dirName = it.path.parentPath.lastPathComponent.toString()
-            val fileName = it.path.lastPathComponent.toString()
-            val file = Paths.get(dirName, fileName).toFile()
-            val simulation = DataSimulation(file)
+            try {
 
-            simulater.simulation = simulation
+                val dirName = it.path.parentPath.lastPathComponent.toString()
+                val fileName = it.path.lastPathComponent.toString()
+                val file = Paths.get(dirName, fileName).toFile()
+                val simulation = DataSimulation(file)
 
-            timer.restart()
+                simulater.simulation = simulation
+
+                timer.restart()
+
+            } catch (e: Exception){
+                e.printStackTrace()
+            }
         }
 
         contentPane.add(explorer, BorderLayout.WEST)
