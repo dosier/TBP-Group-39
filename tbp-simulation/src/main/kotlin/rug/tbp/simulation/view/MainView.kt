@@ -60,6 +60,11 @@ class MainView(path: Path, preferredRefreshDelay: Int = 10) : JFrame("TBP") {
             timer.delay = buttonPanel.refreshSlider.value
         }
 
+        buttonPanel.scaleSlider.value = 1
+        buttonPanel.scaleSlider.addChangeListener {
+            simulater.zoom = (100*buttonPanel.scaleSlider.value).toDouble()
+        }
+
         val explorer = FileExplorerPanel(path.toFile())
         explorer.tree.addTreeSelectionListener {
 

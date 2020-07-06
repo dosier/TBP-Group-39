@@ -12,6 +12,7 @@ class ButtonPanel : JPanel() {
     val pauseButton = JButton("Pause")
     val restartButton = JButton("Restart")
     val refreshSlider = JSlider(1, 100)
+    val scaleSlider = JSlider(1, 5)
     val drawAxisBox = JCheckBox("Axis")
 
     init {
@@ -22,6 +23,9 @@ class ButtonPanel : JPanel() {
         val sliderLabel = Label("Refresh Delay (ms)")
         add(sliderLabel)
         add(refreshSlider)
+        val scaleLabel = Label("Scaling (x)")
+        add(scaleLabel)
+        add(scaleSlider)
     }
 
 }

@@ -21,6 +21,7 @@ import javax.swing.tree.DefaultTreeModel
 class FileExplorerPanel(private val dir: File) : JPanel() {
 
     var tree = JTree(addNodes(dir = dir))
+    var previousList = dir.list()!!
 
     init {
         layout = BorderLayout()
@@ -42,6 +43,20 @@ class FileExplorerPanel(private val dir: File) : JPanel() {
                 }
             }
         }
+        Thread(Runnable {
+
+            while(true) {
+                val newList = dir.list()!!
+                if (!previousList.contentEquals(newList)) {
+                    synchronized(tree) {
+                        tree.model = DefaultTreeModel(addNodes(dir = dir))
+                    }
+                }
+                previousList = newList
+
+                Thread.sleep(1000L)
+            }
+        }).start()
     }
 
     private fun addNodes(curTop: DefaultMutableTreeNode? = null, dir: File) : DefaultMutableTreeNode{
