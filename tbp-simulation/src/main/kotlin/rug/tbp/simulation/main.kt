@@ -7,7 +7,7 @@ import javax.swing.SwingUtilities
 
 fun main() {
     SwingUtilities.invokeLater {
-        MainView(path = Paths.get("/Users/stanvanderbend/IdeaProjects/TBP-Group-39"), preferredRefreshDelay = 10)
+        MainView(path = Paths.get("C:\\Users\\gasto\\Documents\\NeuralNetworks\\TBP-Group-39"), preferredRefreshDelay = 10)
     }
 }
 

@@ -1,5 +1,6 @@
 package rug.tbp.simulation.model
 
+import java.awt.Color
 import java.util.*
 import kotlin.math.pow
 
@@ -14,7 +15,9 @@ data class Body(
     val mass: Double,
     val radius: Double,
     var position: Vector,
+    val color: Color,
     var velocity: Vector = Vector(0.0, 0.0)
+
 ) {
     val lastPositions = ArrayDeque<Vector>()
     fun getMomentum() = velocity * mass

@@ -25,7 +25,7 @@ fun Graphics2D.drawBody(
     val x = (clip.bounds.width.div(2) + body.position.x)
     val y = (clip.bounds.height.div(2) - body.position.y)
     val shape = transform.createTransformedShape(Arc2D.Double(x, y, body.radius, body.radius, 0.0, 360.0, Arc2D.OPEN))
-    paint = Color.WHITE
+    paint = body.color
     fill(shape)
 
     paint = Color.CYAN
@@ -45,7 +45,8 @@ fun Graphics2D.drawXYAxis(){
 fun Graphics2D.drawTrail(
     transform: AffineTransform,
     positions: Collection<Vector>,
-    radius: Double
+    radius: Double,
+    color: Color
 ){
 
     if(positions.isEmpty())
@@ -59,13 +60,13 @@ fun Graphics2D.drawTrail(
     var y0 = (height.div(2) - radius - first.y)
 
     var opacity = 0
-    paint = Color(255, 255, 255, opacity)
+    paint = Color(color.red, color.green, color.blue, opacity)
     var index = 0
     positions.drop(1).forEach { vector ->
         val newOpacity = index.toDouble().div(positions.size).times(255).toInt()
         index++
         if(newOpacity != opacity){
-            paint = Color(255, 255, 255, opacity)
+            paint = Color(color.red, color.green, color.blue, opacity)
             opacity = newOpacity
         }
         val x1 = (width.div(2) + radius.div(2) + vector.x)

@@ -2,6 +2,7 @@ package rug.tbp.simulation.model
 
 import rug.tbp.simulation.readVector
 import rug.tbp.simulation.util.round
+import java.awt.Color
 import java.io.File
 import java.util.ArrayDeque
 
@@ -13,9 +14,9 @@ class DataSimulation(file: File, bodies: List<Body> = emptyList()) : Simulation(
     init {
 
         if (bodies.isEmpty()){
-            val b0 = Body(1.0, 0.05, Vector.ZERO)
-            val b1 = Body(1.0, 0.05, Vector.ZERO)
-            val b2 = Body(1.0,0.05, Vector.ZERO)
+            val b0 = Body(1.0, 0.05, Vector.ZERO, Color.red)
+            val b1 = Body(1.0, 0.05, Vector.ZERO,Color.blue)
+            val b2 = Body(1.0,0.05, Vector.ZERO, Color.green)
             this.bodies = listOf(b0, b1, b2)
         }
 

@@ -4,8 +4,10 @@ import rug.tbp.simulation.model.Vector
 import rug.tbp.simulation.readVector
 import java.io.File
 import java.math.BigDecimal
+import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.concurrent.atomic.AtomicInteger
+import java.util.stream.Collectors
 import kotlin.math.abs
 import kotlin.math.round
 
@@ -30,25 +32,69 @@ val cleanedDataDir: File = Paths.get("cleaned_data").toFile()
  **/
 val readyDataDir: File  = Paths.get("ready_data").toFile()
 
-val rawPath = Paths.get("/Users/stanvanderbend/Documents/MATLAB/Three body problem/data/")
-val trainFile = Paths.get("/Users/stanvanderbend/PycharmProjects/TBP-Group-39/train_data.csv").toFile()
-val testFile = Paths.get("/Users/stanvanderbend/PycharmProjects/TBP-Group-39/test_data.csv").toFile()
+val normalizedDataDir: File = Paths.get("normalized_data").toFile()
+
+val rawPath = Paths.get("C:\\Users\\gasto\\Documents\\NeuralNetworks\\TBP-Group-39\\")
+val trainFile = Paths.get("C:\\Users\\gasto\\Documents\\NNPython\\TBP-Group-39-NN\\train_data.csv").toFile()
+val testFile = Paths.get("C:\\Users\\gasto\\Documents\\NNPython\\TBP-Group-39-NN\\test_data.csv").toFile()
 
 const val tFinal = 3.9
 const val maxAmountStuck = 4
-const val maxFiles = 10_000
+const val maxFiles = 4000
 const val trainTestRatio = 0.8
 
 fun main() {
 //    syncDataToConstantTimeStep()
 //    detectAndCacheCollisions()
 //    prepareDataForModel()
-    saveDataToModelPath()
+//    saveDataToModelPath()
+
+   // normalizeData()
+    saveDataToModelPath(normalizedDataDir)
 }
 
-private fun saveDataToModelPath(){
-
+private fun normalizeData() {
     val files = readyDataDir.readAllCSVFiles()
+            .stream()
+            .limit(maxFiles.toLong())
+            .collect(Collectors.toList())
+    atomicCounter.set(0)
+    total = files.size
+    for (file in files) {
+        sigmoidTransformData(file.toPath(), Paths.get("normalized_data", file.name))
+        val count = atomicCounter.incrementAndGet()
+
+        if (count % 1000 == 0)
+            println("Finished normalizing $count/$total data sets!")
+    }
+}
+
+fun sigmoid(x: Double): Double {
+    return 1 / (1 + Math.pow(Math.E, -1 * x))
+}
+private fun sigmoidTransformData(inputPath: Path, outputhPath: Path){
+    val file = inputPath.toFile()
+    val lines = file.readLines()
+
+    var text = lines.first()+"\n"
+    for((i, line) in lines.withIndex()){
+        if(line.contains("x"))
+            continue
+        val values = line.split(',')
+                .map { sigmoid(it.toDouble()) }
+        text+=values.joinToString(",")
+        if(i < lines.size-1){
+            text += "\n"
+        }
+    }
+    outputhPath.toFile().also {
+        it.createNewFile()
+        it.writeText(text)
+    }
+}
+private fun saveDataToModelPath(dataDir: File) {
+
+    val files = dataDir.readAllCSVFiles().stream().limit(maxFiles.toLong()).collect(Collectors.toList())
 
     atomicCounter.set(0)
     total = files.size
@@ -56,29 +102,48 @@ private fun saveDataToModelPath(){
     val totalTrain = (total * 0.8).toInt()
     val totalTest = total-totalTrain
 
-    trainFile.writeText("x1,y1,vx1,vy1,x2,y2,vx2,vy2,x3,y3,vx3,vy3\n")
-    testFile.writeText("x1,y1,vx1,vy1,x2,y2,vx2,vy2,x3,y3,vx3,vy3\n")
+
+    val trainWriter = trainFile.printWriter()
+    val testWriter = testFile.printWriter()
+    trainWriter.println("x1,y1,vx1,vy1,x2,y2,vx2,vy2,x3,y3,vx3,vy3")
+    testWriter.println("x1,y1,vx1,vy1,x2,y2,vx2,vy2,x3,y3,vx3,vy3")
+
+    var totalLineCount = 0
 
     for((i, file) in files.withIndex()){
 
-        val text =  file.readText().substringAfter('\n')
-
-        val outFile = if(i < totalTrain)
-            trainFile
+        val writer = if(i < totalTrain)
+            trainWriter
         else
-            testFile
+            testWriter
 
-        outFile.appendText(text)
+        val max = if(i < totalTrain)
+            totalTrain
+        else
+            total
 
-        if(i < total-1)
-            outFile.appendText("\n")
+        val inLines = file.readLines()
+        for ((j, line) in inLines.withIndex()) {
+            if(j == 0)
+                continue
+            totalLineCount++
+            writer.println(line)
+        }
+
+        writer.flush()
 
         val count = atomicCounter.incrementAndGet()
 
         if(count % 1000 == 0)
-            println("Finished copying over $count/$total data sets!")
+            println("Finished merging $count/$total data sets!")
     }
 
+    testWriter.close()
+    trainWriter.close()
+
+    val testLines = testFile.readLines().size
+    val trainLines = trainFile.readLines().size
+    val testTrainLines = testLines+trainLines-2
     println("Total train data = $totalTrain, total test data = $totalTest")
 }
 

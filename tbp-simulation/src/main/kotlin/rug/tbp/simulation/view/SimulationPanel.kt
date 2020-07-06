@@ -67,7 +67,7 @@ class SimulationPanel(var zoom: Double = 100.0,
         sim.bodies.forEach {
             if(drawAxis)
                 g2d.drawXYAxis()
-            g2d.drawTrail(transform, it.lastPositions, it.radius)
+            g2d.drawTrail(transform, it.lastPositions, it.radius, it.color)
             g2d.drawBody(transform, it)
         }
     }
